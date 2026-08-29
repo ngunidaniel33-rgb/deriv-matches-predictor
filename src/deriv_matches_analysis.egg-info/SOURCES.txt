@@ -1,0 +1,14 @@
+LICENSE
+README.md
+pyproject.toml
+src/deriv_matches_analysis/__init__.py
+src/deriv_matches_analysis/__main__.py
+src/deriv_matches_analysis/analysis.py
+src/deriv_matches_analysis/cli.py
+src/deriv_matches_analysis.egg-info/PKG-INFO
+src/deriv_matches_analysis.egg-info/SOURCES.txt
+src/deriv_matches_analysis.egg-info/dependency_links.txt
+src/deriv_matches_analysis.egg-info/entry_points.txt
+src/deriv_matches_analysis.egg-info/requires.txt
+src/deriv_matches_analysis.egg-info/top_level.txt
+tests/test_analysis.py

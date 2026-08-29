@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deriv-matches-analysis"
+version = "0.1.0"
+description = "Professional Deriv matches and differs signal analysis toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "GitHub Copilot" }]
+license = { text = "MIT" }
+keywords = ["deriv", "trading", "market-analysis", "matches", "differs", "ticks"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "websockets>=11.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+deriv-analysis = "deriv_matches_analysis.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

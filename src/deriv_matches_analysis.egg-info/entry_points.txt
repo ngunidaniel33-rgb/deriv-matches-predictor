@@ -1,0 +1,2 @@
+[console_scripts]
+deriv-analysis = deriv_matches_analysis.cli:main
