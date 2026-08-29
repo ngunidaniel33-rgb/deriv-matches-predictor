@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deriv Connection</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="theme-dark">
+    <div class="connect-shell">
+      <div class="panel connect-panel">
+        <h2>Connect to Deriv</h2>
+        <p class="muted">Create a Deriv API token and app ID, then connect the dashboard to live market data.</p>
+
+        <form id="deriv-form" class="connect-form">
+          <label class="field">
+            <span>Environment</span>
+            <select id="environment">
+              <option value="real">Real account</option>
+              <option value="demo">Demo account</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>App ID</span>
+            <input id="app-id" type="text" placeholder="e.g. 1089 or your app ID" />
+          </label>
+
+          <label class="field">
+            <span>Access token</span>
+            <input id="access-token" type="password" placeholder="Paste your Deriv access token" />
+          </label>
+
+          <button type="submit" class="primary-btn full-width">Connect account</button>
+        </form>
+
+        <div id="connection-status" class="status-box">Not connected yet.</div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

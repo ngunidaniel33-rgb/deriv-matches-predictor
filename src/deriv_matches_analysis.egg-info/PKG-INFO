@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: deriv-matches-analysis
+Version: 0.1.0
+Summary: Professional Deriv matches and differs signal analysis toolkit
+Author: GitHub Copilot
+License: MIT
+Keywords: deriv,trading,market-analysis,matches,differs,ticks
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# deriv-matches-predictor
+Professional Deriv Matches/Differs Signal Predictor and Market Analysis Tool - Real-time tick analysis, probability engine, backtesting, and educational analytics
