@@ -411,3 +411,32 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* Advanced Features */
+.indicators-panel,
+.performance-panel {
+  padding: 24px;
+  grid-column: 1 / -1;
+}
+
+.metric-grid.compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.metric-box {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(15, 27, 42, 0.08);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.metric-box p {
+  margin: 0;
+}
+
+.compact-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}

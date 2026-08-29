@@ -111,18 +111,9 @@
             </label>
           </div>
 
-          <label class="field">
-            <span>Analysis strategy</span>
-            <select id="strategy-select">
-              <option value="classic">Classic (Probability)</option>
-              <option value="rsi">RSI-based</option>
-              <option value="volatility">Volatility</option>
-            </select>
-          </label>
-
           <label class="field textarea-field">
             <span>Tick values</span>
-            <textarea id="tick-input" rows="12" placeholder="Paste tick values or CSV data here...
+            <textarea id="tick-input" rows="14" placeholder="Paste tick values or CSV data here...
 Example:
 1,2,3,4,5
 or
@@ -133,14 +124,8 @@ tick
           </label>
 
           <div class="action-row">
-            <button id="analyze-btn" class="primary-btn">Analyze</button>
-            <button id="backtest-btn" class="secondary-btn" title="Backtest strategy">📊 Backtest</button>
-            <button id="compare-btn" class="secondary-btn" title="Compare all strategies">⚖️ Compare</button>
-          </div>
-
-          <div class="action-row">
+            <button id="analyze-btn" class="primary-btn">Analyze market</button>
             <button id="clear-btn" class="ghost-btn">Clear</button>
-            <button id="export-btn" class="ghost-btn" title="Export results">Export</button>
           </div>
         </aside>
 
@@ -191,61 +176,6 @@ tick
           <div class="insight-box">
             <h3>Recommendation</h3>
             <p id="recommendation">Waiting for market data to analyze.</p>
-          </div>
-        </section>
-
-        <section class="panel indicators-panel">
-          <div class="panel-header">
-            <h2>Technical indicators</h2>
-          </div>
-
-          <div class="metric-grid compact">
-            <article class="metric-card">
-              <span class="metric-label">RSI (14)</span>
-              <strong id="rsi-value">--</strong>
-              <small>Relative strength</small>
-            </article>
-
-            <article class="metric-card">
-              <span class="metric-label">Bollinger bands</span>
-              <strong id="bollinger-bands" style="font-size: 0.9rem;">--</strong>
-              <small>Upper | Mid | Lower</small>
-            </article>
-
-            <article class="metric-card">
-              <span class="metric-label">Moving averages</span>
-              <strong id="moving-average" style="font-size: 0.85rem;">--</strong>
-              <small>5, 10, 20 periods</small>
-            </article>
-          </div>
-        </section>
-
-        <section class="panel performance-panel">
-          <div class="panel-header">
-            <h2>Performance metrics</h2>
-          </div>
-
-          <div class="metric-box">
-            <p id="performance-metrics">-- No analyses yet</p>
-          </div>
-        </section>
-
-        <section class="panel backtest-panel">
-          <div class="panel-header">
-            <h2>Backtest results</h2>
-            <span id="backtest-status" style="font-size: 0.8rem; color: var(--muted);">Not run</span>
-          </div>
-          <div class="metric-box">
-            <p id="backtest-results">-- Run a backtest to see results</p>
-          </div>
-        </section>
-
-        <section class="panel comparison-panel">
-          <div class="panel-header">
-            <h2>Strategy comparison</h2>
-          </div>
-          <div class="metric-box">
-            <p id="comparison-results">-- Compare strategies to see side-by-side results</p>
           </div>
         </section>
 

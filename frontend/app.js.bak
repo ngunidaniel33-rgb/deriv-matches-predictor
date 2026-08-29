@@ -60,20 +60,10 @@ const elements = {
   recommendation: document.getElementById('recommendation'),
   signalBadge: document.getElementById('signal-badge'),
   connectionStatus: document.getElementById('connection-status'),
-  rsiValue: document.getElementById('rsi-value'),
-  bollingerBands: document.getElementById('bollinger-bands'),
-  movingAverage: document.getElementById('moving-average'),
-  performanceMetrics: document.getElementById('performance-metrics'),
-  strategySelect: document.getElementById('strategy-select'),
-  exportBtn: document.getElementById('export-btn'),
-  backtestBtn: document.getElementById('backtest-btn'),
-  compareBtn: document.getElementById('compare-btn'),
 };
 
 let tickChart;
 let distributionChart;
-let analysisHistory = [];
-let lastAnalysis = null;
 
 function parseValues(rawText) {
   if (!rawText || !rawText.trim()) {
@@ -116,41 +106,7 @@ function parseValues(rawText) {
   return values;
 }
 
-// Technical Indicators
-function calculateRSI(values, period = 14) {
-  if (values.length < period + 1) return null;
-  const changes = [];
-  for (let i = 1; i < values.length; i++) {
-    changes.push(values[i] - values[i - 1]);
-  }
-  const gains = changes.filter(c => c > 0).reduce((s, c) => s + c, 0) / period;
-  const losses = Math.abs(changes.filter(c => c < 0).reduce((s, c) => s + c, 0)) / period;
-  if (losses === 0) return gains > 0 ? 100 : 0;
-  const rs = gains / losses;
-  return 100 - (100 / (1 + rs));
-}
-
-function calculateMovingAverages(values, periods = [5, 10, 20]) {
-  return periods.map(period => ({
-    period,
-    value: values.length >= period ? values.slice(-period).reduce((a, b) => a + b) / period : null,
-  }));
-}
-
-function calculateBollingerBands(values, period = 20, stdDev = 2) {
-  if (values.length < period) return null;
-  const recent = values.slice(-period);
-  const sma = recent.reduce((a, b) => a + b) / period;
-  const variance = recent.reduce((sum, v) => sum + (v - sma) ** 2, 0) / period;
-  const std = Math.sqrt(variance);
-  return {
-    upper: sma + (std * stdDev),
-    middle: sma,
-    lower: sma - (std * stdDev),
-  };
-}
-
-function analyzeValues(values, window, targetDigit, strategy = 'classic') {
+function analyzeValues(values, window, targetDigit) {
   const recent = values.slice(-window);
   const counts = {};
 
@@ -183,17 +139,7 @@ function analyzeValues(values, window, targetDigit, strategy = 'classic') {
   const upRatio = changes.length ? changes.filter((value) => value > 0).length / changes.length : 0;
   const downRatio = changes.length ? changes.filter((value) => value < 0).length / changes.length : 0;
 
-  const rsi = calculateRSI(values);
-  const mas = calculateMovingAverages(values);
-  const bb = calculateBollingerBands(values);
-
   let signalStrength = Math.max(0, (matchProbability - 0.1) * 100 + (upRatio - downRatio) * 50);
-  if (strategy === 'rsi' && rsi !== null) {
-    signalStrength = Math.abs(rsi - 50) * 2;
-  } else if (strategy === 'volatility') {
-    signalStrength = Math.min(100, volatility * 10);
-  }
-
   let recommendation = 'Market is balanced; waiting for stronger confirmation.';
   let badgeClass = 'neutral';
   let badgeText = 'Waiting';
@@ -224,19 +170,12 @@ function analyzeValues(values, window, targetDigit, strategy = 'classic') {
     volatility,
     upRatio,
     downRatio,
-    signalStrength: Math.min(100, signalStrength),
+    signalStrength,
     recommendation,
     badgeClass,
     badgeText,
     distribution: Array.from({ length: 10 }, (_, i) => ({ digit: i, count: counts[i] || 0 })),
     values,
-    rsi,
-    movingAverages: mas,
-    bollingerBands: bb,
-    timestamp: new Date().toISOString(),
-    strategy,
-    dataPoints: values.length,
-    window,
   };
 }
 
@@ -253,30 +192,8 @@ function updateUI(summary) {
   elements.signalBadge.className = `signal-badge ${summary.badgeClass}`;
   elements.signalBadge.textContent = summary.badgeText;
 
-  // Technical Indicators
-  if (elements.rsiValue) {
-    elements.rsiValue.textContent = summary.rsi !== null ? summary.rsi.toFixed(2) : 'N/A';
-  }
-  if (elements.bollingerBands && summary.bollingerBands) {
-    elements.bollingerBands.textContent = `U: ${summary.bollingerBands.upper.toFixed(2)} | M: ${summary.bollingerBands.middle.toFixed(2)} | L: ${summary.bollingerBands.lower.toFixed(2)}`;
-  }
-  if (elements.movingAverage && summary.movingAverages) {
-    elements.movingAverage.textContent = summary.movingAverages.map(ma => `MA${ma.period}: ${ma.value?.toFixed(2) || 'N/A'}`).join(' | ');
-  }
-
-  // Performance Metrics
-  if (elements.performanceMetrics && analysisHistory.length > 1) {
-    const recent = analysisHistory.slice(-10);
-    const wins = recent.filter(a => a.signalStrength > 50).length;
-    const winRate = (wins / recent.length * 100).toFixed(1);
-    elements.performanceMetrics.textContent = `Win Rate: ${winRate}% | Analyses: ${analysisHistory.length} | Avg Signal: ${(recent.reduce((s, a) => s + a.signalStrength, 0) / recent.length).toFixed(1)}`;
-  }
-
   renderTickChart(summary.values);
   renderDistributionChart(summary.distribution);
-  
-  lastAnalysis = summary;
-  analysisHistory.push(summary);
 }
 
 function getThemeColors() {
@@ -379,8 +296,7 @@ function analyze() {
     const values = parseValues(elements.tickInput.value);
     const window = Number(elements.windowInput.value) || 20;
     const targetDigit = elements.targetDigit.value;
-    const strategy = elements.strategySelect?.value || 'classic';
-    const summary = analyzeValues(values, window, targetDigit, strategy);
+    const summary = analyzeValues(values, window, targetDigit);
     updateUI(summary);
   } catch (error) {
     alert(error.message || 'Unable to analyze the provided data.');
@@ -403,11 +319,6 @@ function clearInputs() {
   elements.recommendation.textContent = 'Waiting for market data to analyze.';
   elements.signalBadge.className = 'signal-badge neutral';
   elements.signalBadge.textContent = 'Waiting';
-  
-  if (elements.rsiValue) elements.rsiValue.textContent = '--';
-  if (elements.bollingerBands) elements.bollingerBands.textContent = '--';
-  if (elements.movingAverage) elements.movingAverage.textContent = '--';
-  if (elements.performanceMetrics) elements.performanceMetrics.textContent = '--';
 
   if (tickChart) tickChart.destroy();
   if (distributionChart) distributionChart.destroy();
@@ -489,86 +400,6 @@ async function connectToDeriv() {
   }
 }
 
-function exportAnalysis() {
-  if (analysisHistory.length === 0) {
-    alert('Run an analysis first before exporting.');
-    return;
-  }
-  const json = JSON.stringify(analysisHistory, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `deriv-analysis-${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-async function runBacktest() {
-  try {
-    const values = parseValues(elements.tickInput.value);
-    if (values.length < 30) {
-      alert('Need at least 30 data points for backtest.');
-      return;
-    }
-    const strategy = elements.strategySelect?.value || 'classic';
-    const statusEl = document.getElementById('backtest-status');
-    if (statusEl) statusEl.textContent = 'Running...';
-    const response = await fetch('http://localhost:8765/api/analysis/backtest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values, strategy }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error);
-    const resultsEl = document.getElementById('backtest-results');
-    if (resultsEl) {
-      resultsEl.innerHTML = '<strong>' + strategy + ' Strategy Backtest</strong><br>' +
-        'Tests: ' + data.total_tests + '<br>' +
-        'Win Rate: ' + data.win_rate.toFixed(1) + '%<br>' +
-        'Avg Signal: ' + data.avg_signal_strength.toFixed(1);
-    }
-    if (statusEl) statusEl.textContent = 'Complete';
-  } catch (error) {
-    alert('Backtest failed: ' + error.message);
-  }
-}
-
-async function compareStrategies() {
-  try {
-    const values = parseValues(elements.tickInput.value);
-    if (values.length < 30) {
-      alert('Need at least 30 data points for comparison.');
-      return;
-    }
-    const response = await fetch('http://localhost:8765/api/analysis/compare', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error);
-    const resultsEl = document.getElementById('comparison-results');
-    if (resultsEl && data.comparison) {
-      let html = '<table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">';
-      html += '<tr style="border-bottom: 1px solid #444;"><th style="text-align: left; padding: 4px;">Strategy</th><th style="padding: 4px;">Signal</th><th style="padding: 4px;">Probability</th></tr>';
-      for (const key in data.comparison) {
-        const result = data.comparison[key];
-        html += '<tr style="border-bottom: 1px solid #444;">' +
-          '<td style="padding: 4px;">' + key + '</td>' +
-          '<td style="padding: 4px;">' + result.signal_strength.toFixed(1) + '</td>' +
-          '<td style="padding: 4px;">' + (result.match_probability * 100).toFixed(1) + '%</td>' +
-          '</tr>';
-      }
-      html += '</table>';
-      resultsEl.innerHTML = html;
-    }
-  } catch (error) {
-    alert('Comparison failed: ' + error.message);
-  }
-}
-
-// Event Listeners
 if (elements.analyzeBtn) {
   elements.analyzeBtn.addEventListener('click', analyze);
 }
@@ -584,22 +415,6 @@ if (elements.fileInput) {
 if (elements.themeToggle) {
   elements.themeToggle.addEventListener('click', toggleTheme);
 }
-if (elements.exportBtn) {
-  elements.exportBtn.addEventListener('click', exportAnalysis);
-}
-if (elements.strategySelect) {
-  elements.strategySelect.addEventListener('change', analyze);
-}
-
-const backtestBtn = document.getElementById('backtest-btn');
-if (backtestBtn) {
-  backtestBtn.addEventListener('click', runBacktest);
-}
-
-const compareBtn = document.getElementById('compare-btn');
-if (compareBtn) {
-  compareBtn.addEventListener('click', compareStrategies);
-}
 
 const derivForm = document.getElementById('deriv-form');
 if (derivForm) {
@@ -609,7 +424,6 @@ if (derivForm) {
   });
 }
 
-// Initialize
 if (elements.tickInput) {
   clearInputs();
   loadDemo();
